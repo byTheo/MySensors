@@ -1,5 +1,5 @@
 /**
- * Library ThresholdUtil.h 
+ * Library ThresholdUtil.h - based upon sensbender Sketch
  * 
  * Copyright (c) ByTheo
  * 
@@ -18,7 +18,7 @@
  *   August 1st 2016 - Initial version
  * 
  * Design decisions:
- * - don't put sensor specific code into this library (separation of concern). The main sketch is responsible for the retrieval of sensor values.
+ * - don't put sensro specific code into this library (separation of concern). The main sketch is responsible for the retrieval of sensor values.
  * - Don't use C++ is absorps too much resources. PLain old C is more resource efficient
  * - Don't implement memory management. Freeing up is unnecessary because we don't need to support it. Sensors shouldn't be dynamic in a Sketch
  * 
@@ -35,7 +35,7 @@
 /**
  * Declartion of the type definition used by the library
  */
-typedef enum { TEMPERATURE_SENSOR, HUMIDTY_SENSOR, LIGHTLEVEL_SENSOR, CUSTOM_SENSOR } ThreshHoldedSensorType; // The different kind of sensor type for which you can store values. You can extend this enum to your likings or do a pus request on GITHUB
+typedef enum { TEMPERATURE_SENSOR, HUMIDTY_SENSOR, LIGHTLEVEL_SENSOR, PRESSURE_SENSOR, CUSTOM_SENSOR } ThreshHoldedSensorType; // The different kind of sensor type for which you can store values. You can extend this enum to your likings or do a pus request on GITHUB
 typedef void (*SensorValueRequestedCallback)( uint8_t aSensorId, ThreshHoldedSensorType aType, float *value ); // Callback handler which is called whenever the library needs a new value for a specific sensor
 typedef void (*SensorValueTransmission)( uint8_t child_id, uint8_t sensor_id, ThreshHoldedSensorType sensor_type, float value ); // Callback handler called whenever the library notices that the value of a specific sensor has to be send to the gateway
 
@@ -47,8 +47,8 @@ typedef struct ThresholdedSensorStruct {
   uint8_t sensor_id; // unique id for the sensors for which we hold the values
   ThreshHoldedSensorType sensor_type;
   float      threshHold;
-  uint8_t    forcedTransmissionInterval;
-  uint8_t    measureCounter;
+  int    forcedTransmissionInterval;
+  int    measureCounter;
   float      lastValue;
   unsigned long lastChecked;
   uint8_t    readingInterval;
@@ -71,7 +71,7 @@ thssPtr thresHoldedSensorsrootNode = NULL;
  * forcedTransmissionInterval: The amount of measurements without retransmissions, before a retransmission is triggered. In other words of the values of a sensor don't extend the threshold, a retransmission
  *            is triggered of this given amount of readings.
  */
-void registerThresholdedSensor(   uint8_t child_id, uint8_t sensor_id, ThreshHoldedSensorType sensor_type, float threshHold, uint8_t readingInterval, uint8_t forcedTransmissionInterval ) { // single sensor
+void registerThresholdedSensor(   uint8_t child_id, uint8_t sensor_id, ThreshHoldedSensorType sensor_type, float threshHold, uint8_t readingInterval, int forcedTransmissionInterval ) { // single sensor
   thssPtr aSensor = (ThresholdedSensorStruct*)malloc(sizeof(struct ThresholdedSensorStruct));
   aSensor->sensor_id = sensor_id;
   aSensor->child_id = child_id;
